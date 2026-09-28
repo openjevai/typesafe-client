@@ -134,19 +134,20 @@ func NewClient(opts ...Option) (*Client, error) {
 			return nil, err
 		}
 	}
-	key, err := resolveAPIKey(c.apiKey)
+	keyEnv, baseURLDefault, modelDefault := resolveProvider(c.apiKey)
+	key, err := resolveAPIKey(c.apiKey, keyEnv)
 	if err != nil {
 		return nil, err
 	}
 	c.apiKey = key
-	c.baseURL = strings.TrimRight(resolve(c.baseURL, EnvBaseURL, DefaultBaseURL), "/")
+	c.baseURL = strings.TrimRight(resolve(c.baseURL, EnvBaseURL, baseURLDefault), "/")
 	// Request paths are appended verbatim, so require an absolute http(s)
 	// URL with a host and no query or fragment.
 	if u, err := url.Parse(c.baseURL); err != nil || (u.Scheme != "http" && u.Scheme != "https") ||
 		u.Host == "" || u.RawQuery != "" || u.Fragment != "" || strings.Contains(c.baseURL, "?") || strings.Contains(c.baseURL, "#") {
 		return nil, configf("invalid base URL %q: expected an absolute http(s) URL with no query or fragment", c.baseURL)
 	}
-	c.model = resolve(c.model, EnvDefaultModel, DefaultModel)
+	c.model = resolve(c.model, EnvDefaultModel, modelDefault)
 	if c.logger == nil {
 		l, err := loggerFromEnv()
 		if err != nil {
@@ -169,10 +170,31 @@ func resolve(explicit, env, def string) string {
 	return def
 }
 
-func resolveAPIKey(explicit string) (string, error) {
-	key := strings.TrimSpace(resolve(explicit, EnvAPIKey, ""))
+// resolveProvider determines which provider (TypeSafe or OpenJEV) to use,
+// returning the key env var, default base URL, and default model. Selection
+// order: explicit JEV_PROVIDER=openjev wins; otherwise TypeSafe if its key is
+// set (explicit or env); otherwise OpenJEV if only OPENJEV_API_KEY is set;
+// otherwise TypeSafe defaults (which will fail on a missing key, as before).
+func resolveProvider(explicitKey string) (keyEnv, baseURLDefault, modelDefault string) {
+	provider := strings.TrimSpace(os.Getenv(EnvJevProvider))
+	if provider == "openjev" {
+		return EnvOpenjevAPIKey, OpenjevDefaultBaseURL, OpenjevDefaultModel
+	}
+	// TypeSafe is the default when its key is available.
+	if explicitKey != "" || strings.TrimSpace(os.Getenv(EnvAPIKey)) != "" {
+		return EnvAPIKey, DefaultBaseURL, DefaultModel
+	}
+	// Fall back to OpenJEV if only its key is set.
+	if strings.TrimSpace(os.Getenv(EnvOpenjevAPIKey)) != "" {
+		return EnvOpenjevAPIKey, OpenjevDefaultBaseURL, OpenjevDefaultModel
+	}
+	return EnvAPIKey, DefaultBaseURL, DefaultModel
+}
+
+func resolveAPIKey(explicit, keyEnv string) (string, error) {
+	key := strings.TrimSpace(resolve(explicit, keyEnv, ""))
 	if key == "" {
-		return "", configf("no API key was provided; pass WithAPIKey or set %s", EnvAPIKey)
+		return "", configf("no API key was provided; pass WithAPIKey or set %s", keyEnv)
 	}
 	for i := 0; i < len(key); i++ {
 		// Printable ASCII excluding space.

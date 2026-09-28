@@ -48,6 +48,17 @@ const (
 	DefaultModel = "jev-latest"
 )
 
+// OpenJEV defaults. OpenJEV (https://openjev.sh) is a free community gateway
+// to the same Jev model. TypeSafe stays the default; OpenJEV is selected only
+// when JEV_PROVIDER=openjev, or when no TypeSafe key is set but
+// OPENJEV_API_KEY is.
+const (
+	// OpenjevDefaultBaseURL is the OpenJEV API root.
+	OpenjevDefaultBaseURL = "https://api.openjev.sh"
+	// OpenjevDefaultModel is the model id for Jev via OpenJEV.
+	OpenjevDefaultModel = "openjev"
+)
+
 // Environment variables consulted by NewClient. Explicit options take
 // precedence; empty or whitespace-only values are ignored.
 const (
@@ -55,6 +66,13 @@ const (
 	EnvBaseURL      = "TYPESAFE_BASE_URL"
 	EnvDefaultModel = "TYPESAFE_DEFAULT_MODEL"
 	EnvLogLevel     = "TYPESAFE_LOG_LEVEL"
+	// EnvOpenjevAPIKey is the environment variable for the OpenJEV API key.
+	EnvOpenjevAPIKey = "OPENJEV_API_KEY" //nolint:gosec // G101: an environment variable name, not a credential.
+	// EnvJevProvider selects the provider: "openjev" forces OpenJEV; any
+	// other value (or unset) leaves TypeSafe as the default. OpenJEV is
+	// also auto-selected when TYPESAFE_API_KEY is unset and
+	// OPENJEV_API_KEY is set.
+	EnvJevProvider = "JEV_PROVIDER"
 )
 
 const (

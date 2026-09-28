@@ -11,7 +11,8 @@ use serde_json::Value;
 use crate::answers::{decode_models, ModelMetadata, SystemOneResponse};
 use crate::call_options::{CallOptions, ResolvedCall};
 use crate::config::{
-    resolve_api_key, resolve_base_url, resolve_default_model, validate_timeout, LogLevel,
+    resolve_api_key_with_env, resolve_base_url_with_default, resolve_default_model_with_default,
+    resolve_provider, validate_timeout, LogLevel,
 };
 use crate::errors::{api_error_message, request_id_of, ApiError, ApiErrorKind, Error};
 use crate::logging;
@@ -245,10 +246,12 @@ impl ClientBuilder {
 
     /// Builds the client, validating all settings.
     pub fn build(self) -> Result<Client, Error> {
-        let api_key = resolve_api_key(self.api_key.as_deref())?;
-        let base_url = resolve_base_url(self.base_url.as_deref());
+        let provider = resolve_provider(self.api_key.as_deref());
+        let api_key = resolve_api_key_with_env(self.api_key.as_deref(), provider.key_env)?;
+        let base_url = resolve_base_url_with_default(self.base_url.as_deref(), provider.base_url);
         validate_base_url(&base_url)?;
-        let default_model = resolve_default_model(self.default_model.as_deref());
+        let default_model =
+            resolve_default_model_with_default(self.default_model.as_deref(), provider.model);
         let timeout = match self.timeout {
             Some(timeout) => validate_timeout(timeout)?,
             None => crate::DEFAULT_TIMEOUT,

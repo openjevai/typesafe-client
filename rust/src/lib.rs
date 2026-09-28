@@ -89,6 +89,15 @@ pub const DEFAULT_BASE_URL: &str = "https://api.typesafe.ai";
 /// The model used when neither the builder nor `TYPESAFE_DEFAULT_MODEL` set one.
 pub const DEFAULT_MODEL: &str = "jev-latest";
 
+/// OpenJEV default base URL. OpenJEV (https://openjev.sh) is a free community
+/// gateway to the same Jev model. TypeSafe stays the default; OpenJEV is
+/// selected only when `JEV_PROVIDER=openjev`, or when no TypeSafe key is set
+/// but `OPENJEV_API_KEY` is.
+pub const OPENJEV_DEFAULT_BASE_URL: &str = "https://api.openjev.sh";
+
+/// The model id for Jev via OpenJEV.
+pub const OPENJEV_DEFAULT_MODEL: &str = "openjev";
+
 /// The default per-attempt timeout (covers connect through reading the full body).
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(10);
 

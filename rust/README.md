@@ -141,6 +141,10 @@ blank value is ignored.
 | Log level | `.log_level(l)` | `TYPESAFE_LOG_LEVEL` | off (`debug`, `info`, `warn`, `error`, `off`) |
 | Retry policy | `.retry_policy(p)` | — | see [Retries](#retries) |
 
+When `JEV_PROVIDER=openjev` is set, or when `TYPESAFE_API_KEY` is unset and
+`OPENJEV_API_KEY` is set, the defaults change to `https://api.openjev.sh`,
+model `openjev`, and key from `OPENJEV_API_KEY`. Explicit options always win.
+
 The API key is trimmed and validated at construction: empty keys, and keys
 containing whitespace, control characters, or non-ASCII characters, are
 rejected with a configuration error. The key never appears in `Debug` output
@@ -416,6 +420,8 @@ configure `debug` accordingly. Logs are emitted through the
 | `TYPESAFE_BASE_URL` | Base URL override |
 | `TYPESAFE_DEFAULT_MODEL` | Default model override |
 | `TYPESAFE_LOG_LEVEL` | `debug` / `info` / `warn` / `error` / `off` |
+| `OPENJEV_API_KEY` | OpenJEV API key (used when `JEV_PROVIDER=openjev`, or when `TYPESAFE_API_KEY` is unset) |
+| `JEV_PROVIDER` | Set to `openjev` to force the OpenJEV gateway; otherwise TypeSafe is the default |
 
 ## Examples
 

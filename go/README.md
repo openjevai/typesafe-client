@@ -221,6 +221,10 @@ the body. Bound a whole call with a context deadline.
 | `WithHeader` | | none |
 | `WithHTTPClient` | | `&http.Client{}` |
 
+When `JEV_PROVIDER=openjev` is set, or when `TYPESAFE_API_KEY` is unset and
+`OPENJEV_API_KEY` is set, the defaults change to `https://api.openjev.sh`,
+model `openjev`, and key from `OPENJEV_API_KEY`. Explicit options always win.
+
 Explicit options take precedence over environment variables. Blank environment values are ignored.
 
 **Gateways.** Any endpoint that implements the

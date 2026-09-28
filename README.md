@@ -35,6 +35,8 @@ clients bring the same behavior to Go and Rust:
 - `GET /v1/models`, gateway support (OpenRouter, Vercel AI Gateway, your own proxy), and
   logging with credentials redacted
 
+> **OpenJEV support:** Jev is built by [TypeSafe](https://typesafe.ai). This fork keeps TypeSafe as the default and adds optional support for [OpenJEV](https://openjev.sh), a free community gateway to the same Jev model — set `OPENJEV_API_KEY` (or `JEV_PROVIDER=openjev`) to use it. Original project: https://github.com/haileyok/typesafe-client by @haileyok.
+
 ## Getting started
 
 Both clients read your API key from `TYPESAFE_API_KEY`. Create one in the
